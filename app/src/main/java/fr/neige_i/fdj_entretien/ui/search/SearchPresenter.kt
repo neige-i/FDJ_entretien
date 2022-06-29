@@ -30,7 +30,7 @@ class SearchPresenter @Inject constructor(
                     teamStates = teamResponses.map { teamResponse ->
                         TeamState(
                             id = teamResponse.idTeam!!,
-                            badgeImageUrl = teamResponse.strTeamBadge!!,
+                            badgeImageUrl = teamResponse.strTeamBadge,
                             onClicked = { searchView?.openTeamDetails(teamName = teamResponse.strTeam!!) }
                         )
                     }

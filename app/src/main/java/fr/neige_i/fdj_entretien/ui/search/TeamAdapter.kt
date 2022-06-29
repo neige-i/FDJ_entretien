@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.databinding.ItemTeamBinding
 
 class TeamAdapter : ListAdapter<TeamState, TeamAdapter.TeamViewHolder>(TeamDiffUtil()) {
@@ -24,6 +25,7 @@ class TeamAdapter : ListAdapter<TeamState, TeamAdapter.TeamViewHolder>(TeamDiffU
             Glide
                 .with(binding.teamBadgeImg)
                 .load(team.badgeImageUrl)
+                .error(R.drawable.ic_no_image)
                 .into(binding.teamBadgeImg)
 
             // STEP 5: Select a team

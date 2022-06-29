@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.databinding.ActivityDetailBinding
 import fr.neige_i.fdj_entretien.util.viewBinding
 import kotlinx.coroutines.flow.Flow
@@ -56,6 +57,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
                     Glide
                         .with(this@DetailActivity)
                         .load(detailState.bannerImageUrl)
+                        .error(R.drawable.ic_no_image)
                         .into(binding.teamBannerImg)
 
                     binding.teamCountryTxt.text = detailState.country
