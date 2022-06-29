@@ -25,7 +25,7 @@ class SearchPresenter @Inject constructor(
         this.searchView = searchView
 
         launch {
-            searchRepository.getSearchedLeagueNameFlow().collect { searchedLeagueName ->
+            searchRepository.getSearchedLeagueNameFlow().collectLatest { searchedLeagueName ->
                 // STEP 2: API call
                 sportRepository.getTeamsByLeagueFlow(searchedLeagueName).filterNotNull().collectLatest { teamResponses ->
                     // STEP 3: Handle API response
@@ -53,7 +53,7 @@ class SearchPresenter @Inject constructor(
 
     override fun onMenuCreated() {
         launch {
-            searchRepository.getCurrentQueryFlow().collect { currentQuery ->
+            searchRepository.getCurrentQueryFlow().collectLatest { currentQuery ->
 
                 val autocompleteStates = if (currentQuery.isBlank()) {
                     emptyList()
