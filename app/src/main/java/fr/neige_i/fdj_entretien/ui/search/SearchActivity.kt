@@ -7,17 +7,12 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.databinding.ActivitySearchBinding
 import fr.neige_i.fdj_entretien.ui.detail.DetailActivity
 import fr.neige_i.fdj_entretien.util.toCharSequence
 import fr.neige_i.fdj_entretien.util.viewBinding
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -104,14 +99,8 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
         binding.searchSuggestions.isVisible = isAutocompleteVisible
     }
 
-    override fun showAutocompleteSuggestions(autocompleteStateFlow: Flow<List<AutocompleteState>>) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                autocompleteStateFlow.collect { autocompleteStates ->
-                    autocompleteAdapter.submitList(autocompleteStates)
-                }
-            }
-        }
+    override fun showAutocompleteSuggestions(autocompleteStates: List<AutocompleteState>) {
+        autocompleteAdapter.submitList(autocompleteStates)
     }
 
     override fun showSearchResults(searchState: SearchState) {

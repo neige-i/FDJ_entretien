@@ -5,7 +5,9 @@ import fr.neige_i.fdj_entretien.data.search.SearchRepository
 import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -51,11 +53,31 @@ class SearchPresenter @Inject constructor(
 
     override fun onMenuCreated() {
         launch {
-            val currentQuery = searchRepository.getCurrentQueryFlow().first()
+            searchRepository.getCurrentQueryFlow().collect { currentQuery ->
 
-            if (currentQuery.isNotEmpty()) {
+                val autocompleteStates = if (currentQuery.isBlank()) {
+                    emptyList()
+                } else {
+                    sportRepository.getSoccerLeaguesFlow().first()
+                        .filter { league ->
+                            league.strLeague?.contains(currentQuery, ignoreCase = true) == true ||
+                                    league.strLeagueAlternate?.contains(currentQuery, ignoreCase = true) == true
+                        }
+                        .map { league ->
+                            AutocompleteState(
+                                id = league.idLeague!!,
+                                suggestion = league.strLeague!!,
+                                onClicked = { searchView?.setSearchQuery(league.strLeague) }
+                            )
+                        }
+                }
+
                 withContext(Dispatchers.Main) {
-                    searchView?.expandSearchView(currentQuery)
+                    searchView?.showAutocompleteSuggestions(autocompleteStates)
+
+                    if (currentQuery.isNotEmpty()) {
+                        searchView?.expandSearchView(currentQuery)
+                    }
                 }
             }
         }
@@ -63,34 +85,11 @@ class SearchPresenter @Inject constructor(
 
     override fun onSearchModified(leagueName: String) {
         searchRepository.setCurrentQuery(leagueName)
-
         searchView?.setAutocompleteVisibility(true)
-
-        val autocompleteStatesFlow = if (leagueName.isBlank()) {
-            flowOf(emptyList())
-        } else {
-            sportRepository.getSoccerLeaguesFlow().map { soccerLeagues ->
-                soccerLeagues
-                    .filter { league ->
-                        league.strLeague?.contains(leagueName, ignoreCase = true) == true ||
-                                league.strLeagueAlternate?.contains(leagueName, ignoreCase = true) == true
-                    }
-                    .map { league ->
-                        AutocompleteState(
-                            id = league.idLeague!!,
-                            suggestion = league.strLeague!!,
-                            onClicked = { searchView?.setSearchQuery(league.strLeague) }
-                        )
-                    }
-            }
-        }
-
-        searchView?.showAutocompleteSuggestions(autocompleteStatesFlow)
     }
 
     override fun onSearchSubmitted(leagueName: String) {
         searchRepository.setSearchedLeagueName(leagueName)
-
         searchView?.setAutocompleteVisibility(false)
     }
 

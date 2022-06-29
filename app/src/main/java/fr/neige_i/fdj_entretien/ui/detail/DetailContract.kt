@@ -1,11 +1,9 @@
 package fr.neige_i.fdj_entretien.ui.detail
 
-import kotlinx.coroutines.flow.Flow
-
 interface DetailContract {
 
     interface View {
-        fun showDetailInfo(detailStateFlow: Flow<DetailState>)
+        fun showDetailInfo(detailState: DetailState)
     }
 
     interface Presenter {
