@@ -8,4 +8,6 @@
     <string name="team_banner_image">Team banner image</string>
 
     <string name="team_count_in_league">There are %d teams in %s</string>
+
+    <string name="no_team_found_error">No teams found for this league</string>
 </resources>

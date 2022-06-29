@@ -9,6 +9,7 @@ interface SearchContract {
         fun showAutocompleteSuggestions(autocompleteStates: List<AutocompleteState>)
         fun showSearchResults(searchState: SearchState)
         fun openTeamDetails(teamName: String)
+        fun showErrorToast()
     }
 
     interface Presenter {

@@ -6,7 +6,6 @@ import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -27,28 +26,34 @@ class SearchPresenter @Inject constructor(
         launch {
             searchRepository.getSearchedLeagueNameFlow().collectLatest { searchedLeagueName ->
                 // STEP 2: API call
-                sportRepository.getTeamsByLeagueFlow(searchedLeagueName).filterNotNull().collectLatest { teamResponses ->
+                sportRepository.getTeamsByLeagueFlow(searchedLeagueName).collectLatest { teamResponses ->
                     // STEP 3: Handle API response
-                    val searchState = SearchState(
-                        resultCountText = LocalText.ResWithArgs(
-                            stringId = R.string.team_count_in_league,
-                            args = listOf(teamResponses.size, searchedLeagueName)
-                        ),
-                        teamStates = teamResponses.mapNotNull { teamResponse ->
-                            if (teamResponse.idTeam != null && teamResponse.strTeamBadge != null && teamResponse.strTeam != null) {
-                                TeamState(
-                                    id = teamResponse.idTeam,
-                                    badgeImageUrl = teamResponse.strTeamBadge,
-                                    onClicked = { searchView.openTeamDetails(teamName = teamResponse.strTeam) }
-                                )
-                            } else {
-                                null
-                            }
+                    if (teamResponses == null) {
+                        withContext(Dispatchers.Main) {
+                            searchView.showErrorToast()
                         }
-                    )
+                    } else {
+                        val searchState = SearchState(
+                            resultCountText = LocalText.ResWithArgs(
+                                stringId = R.string.team_count_in_league,
+                                args = listOf(teamResponses.size, searchedLeagueName)
+                            ),
+                            teamStates = teamResponses.mapNotNull { teamResponse ->
+                                if (teamResponse.idTeam != null && teamResponse.strTeamBadge != null && teamResponse.strTeam != null) {
+                                    TeamState(
+                                        id = teamResponse.idTeam,
+                                        badgeImageUrl = teamResponse.strTeamBadge,
+                                        onClicked = { searchView.openTeamDetails(teamName = teamResponse.strTeam) }
+                                    )
+                                } else {
+                                    null
+                                }
+                            }
+                        )
 
-                    withContext(Dispatchers.Main) {
-                        searchView.showSearchResults(searchState)
+                        withContext(Dispatchers.Main) {
+                            searchView.showSearchResults(searchState)
+                        }
                     }
                 }
             }
