@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.detail.DetailActivity"
+    >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/detail_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            tools:title="Arsenal"
+            />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        >
+
+        <ImageView
+            android:id="@+id/team_banner_img"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/team_banner_image"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@drawable/ic_launcher_background"
+            tools:src="@drawable/ic_launcher_foreground"
+            />
+
+        <TextView
+            android:id="@+id/team_country_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/team_banner_img"
+            tools:text="England"
+            />
+
+        <TextView
+            android:id="@+id/team_league_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/team_country_txt"
+            tools:text="English Premier League"
+            />
+
+        <TextView
+            android:id="@+id/team_description_text"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:scrollbars="vertical"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/team_league_txt"
+            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vehicula metus dolor, in efficitur ipsum sollicitudin et. Aenean turpis nisl, cursus sit amet consequat et, convallis malesuada lacus. Aliquam rutrum, neque at vestibulum vestibulum, leo turpis laoreet leo, quis gravida sem mi vitae orci. Vestibulum at urna sed tortor hendrerit semper eget ut urna. Fusce aliquam molestie lorem a lacinia. Proin a ex a ipsum volutpat porta. Sed tincidunt vehicula sollicitudin. Curabitur vitae congue lorem. Nulla nec aliquam arcu. Suspendisse efficitur, diam ut euismod pretium, tellus ex vehicula risus, quis posuere nibh arcu bibendum lacus. Mauris quis leo hendrerit est sollicitudin lacinia mollis a nisl. Curabitur varius leo ac arcu dapibus lacinia. Sed erat turpis, porttitor vitae malesuada non, dignissim rutrum massa. Suspendisse pretium mattis nisi sed fringilla."
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

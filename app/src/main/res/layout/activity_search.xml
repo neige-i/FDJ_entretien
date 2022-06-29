@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".ui.search.SearchActivity"
     >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -29,13 +29,40 @@
         >
 
         <TextView
+            android:id="@+id/search_result_count_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello World!"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="5dp"
+            app:layout_constraintBottom_toTopOf="@id/search_results"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            tools:text="There are 13 teams in English Premier League"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_results"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_result_count_txt"
+            app:spanCount="2"
+            tools:listitem="@layout/item_team"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_suggestions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/item_autocomplete"
+            tools:visibility="gone"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
