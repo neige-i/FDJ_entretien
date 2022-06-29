@@ -1,12 +1,14 @@
 package fr.neige_i.fdj_entretien.ui.detail
 
+import fr.neige_i.fdj_entretien.data.search.SearchRepository
 import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DetailPresenter @Inject constructor(
     private val sportRepository: SportRepository,
+    private val searchRepository: SearchRepository,
 ) : DetailContract.Presenter {
 
     private var detailView: DetailContract.View? = null
@@ -18,14 +20,17 @@ class DetailPresenter @Inject constructor(
     override fun onTeamNameRetrieved(teamName: String) {
         detailView?.showDetailInfo(
             // STEP 6: API call
-            sportRepository.getTeamByNameFlow(teamName).filterNotNull().map {
+            combine(
+                sportRepository.getTeamByNameFlow(teamName).filterNotNull(),
+                searchRepository.getSearchedLeagueNameFlow(),
+            ) { team, searchedLeagueName ->
                 // STEP 7: Handle API response
                 DetailState(
-                    toolbarTitle = it.strTeam!!,
-                    bannerImageUrl = it.strTeamBanner,
-                    country = it.strCountry!!,
-                    league = it.strLeague!!,
-                    description = it.strDescriptionEN!!,
+                    toolbarTitle = team.strTeam!!,
+                    bannerImageUrl = team.strTeamBanner,
+                    country = team.strCountry!!,
+                    league = searchedLeagueName,
+                    description = team.strDescriptionEN!!,
                 )
             }
         )

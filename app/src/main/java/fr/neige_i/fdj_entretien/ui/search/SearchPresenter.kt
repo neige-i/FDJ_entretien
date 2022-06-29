@@ -1,6 +1,7 @@
 package fr.neige_i.fdj_entretien.ui.search
 
 import fr.neige_i.fdj_entretien.R
+import fr.neige_i.fdj_entretien.data.search.SearchRepository
 import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.flow.filterNotNull
@@ -10,6 +11,7 @@ import javax.inject.Inject
 
 class SearchPresenter @Inject constructor(
     private val sportRepository: SportRepository,
+    private val searchRepository: SearchRepository,
 ) : SearchContract.Presenter {
 
     private var searchView: SearchContract.View? = null
@@ -44,6 +46,8 @@ class SearchPresenter @Inject constructor(
     }
 
     override fun onSearchSubmitted(leagueName: String) {
+        searchRepository.setSearchedLeagueName(leagueName)
+
         searchView?.setAutocompleteVisibility(false)
 
         searchView?.showSearchResults(
