@@ -3,8 +3,10 @@ package fr.neige_i.fdj_entretien.ui.search
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -26,11 +28,18 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
     @Inject
     lateinit var presenter: SearchContract.Presenter
 
+    private val teamAdapter = TeamAdapter()
+    private val autocompleteAdapter = AutocompleteAdapter()
+    private lateinit var searchView: SearchView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
         setSupportActionBar(binding.searchToolbar)
+
+        binding.searchSuggestions.adapter = autocompleteAdapter
+        binding.searchResults.adapter = teamAdapter
 
         presenter.onCreated(this)
     }
@@ -38,16 +47,35 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_search, menu)
 
-        val searchView = menu?.findItem(R.id.action_search)?.actionView as SearchView
+        val searchMenuItem = menu?.findItem(R.id.action_search)
 
-        searchView.queryHint = getString(R.string.search_hint)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextChange(newText: String?): Boolean = false
+        searchView = (searchMenuItem?.actionView as SearchView)
+            .apply {
+                queryHint = getString(R.string.search_hint)
 
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // STEP 1: Search a league
-                presenter.onSearchSubmitted(leagueName = query.orEmpty())
-                return false
+                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        presenter.onSearchModified(leagueName = newText.orEmpty())
+                        return false
+                    }
+
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        // STEP 1: Search a league
+                        presenter.onSearchSubmitted(leagueName = query.orEmpty())
+                        return false
+                    }
+                })
+            }
+
+        searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                setAutocompleteVisibility(true)
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                setAutocompleteVisibility(false)
+                return true
             }
         })
 
@@ -59,10 +87,25 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
         presenter.onDestroy()
     }
 
-    override fun showSearchResults(searchStateFlow: Flow<SearchState>) {
-        val teamAdapter = TeamAdapter()
-        binding.searchResults.adapter = teamAdapter
+    override fun setSearchQuery(searchQuery: String) {
+        searchView.setQuery(searchQuery, true)
+    }
 
+    override fun setAutocompleteVisibility(isAutocompleteVisible: Boolean) {
+        binding.searchSuggestions.isVisible = isAutocompleteVisible
+    }
+
+    override fun showAutocompleteSuggestions(autocompleteStateFlow: Flow<List<AutocompleteState>>) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                autocompleteStateFlow.collect { autocompleteStates ->
+                    autocompleteAdapter.submitList(autocompleteStates)
+                }
+            }
+        }
+    }
+
+    override fun showSearchResults(searchStateFlow: Flow<SearchState>) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 // STEP 4: Display the team list
