@@ -34,12 +34,16 @@ class SearchPresenter @Inject constructor(
                             stringId = R.string.team_count_in_league,
                             args = listOf(teamResponses.size, searchedLeagueName)
                         ),
-                        teamStates = teamResponses.map { teamResponse ->
-                            TeamState(
-                                id = teamResponse.idTeam!!,
-                                badgeImageUrl = teamResponse.strTeamBadge,
-                                onClicked = { searchView.openTeamDetails(teamName = teamResponse.strTeam!!) }
-                            )
+                        teamStates = teamResponses.mapNotNull { teamResponse ->
+                            if (teamResponse.idTeam != null && teamResponse.strTeamBadge != null && teamResponse.strTeam != null) {
+                                TeamState(
+                                    id = teamResponse.idTeam,
+                                    badgeImageUrl = teamResponse.strTeamBadge,
+                                    onClicked = { searchView.openTeamDetails(teamName = teamResponse.strTeam) }
+                                )
+                            } else {
+                                null
+                            }
                         }
                     )
 
@@ -63,12 +67,16 @@ class SearchPresenter @Inject constructor(
                             league.strLeague?.contains(currentQuery, ignoreCase = true) == true ||
                                     league.strLeagueAlternate?.contains(currentQuery, ignoreCase = true) == true
                         }
-                        .map { league ->
-                            AutocompleteState(
-                                id = league.idLeague!!,
-                                suggestion = league.strLeague!!,
-                                onClicked = { searchView?.setSearchQuery(league.strLeague) }
-                            )
+                        .mapNotNull { league ->
+                            if (league.idLeague != null && league.strLeague != null) {
+                                AutocompleteState(
+                                    id = league.idLeague,
+                                    suggestion = league.strLeague,
+                                    onClicked = { searchView?.setSearchQuery(league.strLeague) }
+                                )
+                            } else {
+                                null
+                            }
                         }
                 }
 

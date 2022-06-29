@@ -32,16 +32,18 @@ class DetailPresenter @Inject constructor(
             ) { team, searchedLeagueName ->
 
                 // STEP 7: Handle API response
-                val detailState = DetailState(
-                    toolbarTitle = team.strTeam!!,
-                    bannerImageUrl = team.strTeamBanner,
-                    country = team.strCountry!!,
-                    league = searchedLeagueName,
-                    description = team.strDescriptionEN!!,
-                )
+                if (team.strTeam != null && team.strTeamBanner != null && team.strCountry != null && team.strDescriptionEN != null) {
+                    val detailState = DetailState(
+                        toolbarTitle = team.strTeam,
+                        bannerImageUrl = team.strTeamBanner,
+                        country = team.strCountry,
+                        league = searchedLeagueName,
+                        description = team.strDescriptionEN,
+                    )
 
-                withContext(Dispatchers.Main) {
-                    detailView?.showDetailInfo(detailState)
+                    withContext(Dispatchers.Main) {
+                        detailView?.showDetailInfo(detailState)
+                    }
                 }
             }.collect()
         }
