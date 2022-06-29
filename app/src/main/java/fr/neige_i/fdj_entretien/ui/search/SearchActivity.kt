@@ -30,6 +30,8 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
 
     private val teamAdapter = TeamAdapter()
     private val autocompleteAdapter = AutocompleteAdapter()
+
+    private var searchMenuItem: MenuItem? = null
     private lateinit var searchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +49,7 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_search, menu)
 
-        val searchMenuItem = menu?.findItem(R.id.action_search)
+        searchMenuItem = menu?.findItem(R.id.action_search)
 
         searchView = (searchMenuItem?.actionView as SearchView)
             .apply {
@@ -67,7 +69,9 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
                 })
             }
 
-        searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+        presenter.onMenuCreated()
+
+        searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
                 setAutocompleteVisibility(true)
                 return true
@@ -91,6 +95,11 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
         searchView.setQuery(searchQuery, true)
     }
 
+    override fun expandSearchView(searchQuery: String) {
+        searchMenuItem?.expandActionView()
+        searchView.setQuery(searchQuery, false)
+    }
+
     override fun setAutocompleteVisibility(isAutocompleteVisible: Boolean) {
         binding.searchSuggestions.isVisible = isAutocompleteVisible
     }
@@ -105,16 +114,9 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
         }
     }
 
-    override fun showSearchResults(searchStateFlow: Flow<SearchState>) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // STEP 4: Display the team list
-                searchStateFlow.collect { searchState ->
-                    binding.searchResultCountTxt.text = searchState.resultCountText.toCharSequence(this@SearchActivity)
-                    teamAdapter.submitList(searchState.teamStates)
-                }
-            }
-        }
+    override fun showSearchResults(searchState: SearchState) {
+        binding.searchResultCountTxt.text = searchState.resultCountText.toCharSequence(this@SearchActivity)
+        teamAdapter.submitList(searchState.teamStates)
     }
 
     override fun openTeamDetails(teamName: String) {
