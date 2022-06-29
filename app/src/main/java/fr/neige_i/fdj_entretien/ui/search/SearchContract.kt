@@ -6,7 +6,7 @@ interface SearchContract {
 
     interface View {
         fun showSearchResults(searchStateFlow: Flow<SearchState>)
-        fun openTeamDetails(teamId: Int)
+        fun openTeamDetails(teamName: String)
     }
 
     interface Presenter {

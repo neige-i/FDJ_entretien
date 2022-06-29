@@ -5,6 +5,7 @@
     <string name="search_hint">Search by league</string>
 
     <string name="team_badge_image">Team badge image</string>
+    <string name="team_banner_image">Team banner image</string>
 
     <string name="team_count_in_league">There are %d teams in %s</string>
 </resources>

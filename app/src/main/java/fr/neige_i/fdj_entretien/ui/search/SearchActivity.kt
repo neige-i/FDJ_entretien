@@ -1,7 +1,7 @@
 package fr.neige_i.fdj_entretien.ui.search
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -11,6 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.databinding.ActivitySearchBinding
+import fr.neige_i.fdj_entretien.ui.detail.DetailActivity
 import fr.neige_i.fdj_entretien.util.toCharSequence
 import fr.neige_i.fdj_entretien.util.viewBinding
 import kotlinx.coroutines.flow.Flow
@@ -73,7 +74,10 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
         }
     }
 
-    override fun openTeamDetails(teamId: Int) {
-        Log.d("Neige", "openTeamDetails: $teamId")
+    override fun openTeamDetails(teamName: String) {
+        startActivity(
+            Intent(this, DetailActivity::class.java)
+                .putExtra(DetailActivity.EXTRA_TEAM_NAME, teamName)
+        )
     }
 }

@@ -8,4 +8,7 @@ interface SportDataSource {
 
     @GET("search_all_teams.php")
     suspend fun getTeamsByLeague(@Query("l") league: String): TeamListResponse
+
+    @GET("searchteams.php")
+    suspend fun getTeamByName(@Query("t") team: String): TeamListResponse
 }

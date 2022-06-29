@@ -14,4 +14,8 @@ class SportRepository @Inject constructor(
     fun getTeamsByLeagueFlow(leagueName: String): Flow<List<TeamResponse>?> = flow {
         emit(sportDataSource.getTeamsByLeague(leagueName).teams)
     }
+
+    fun getTeamByNameFlow(teamName: String): Flow<TeamResponse?> = flow {
+        emit(sportDataSource.getTeamByName(teamName).teams?.get(0))
+    }
 }
