@@ -5,9 +5,7 @@ import fr.neige_i.fdj_entretien.data.search.SearchRepository
 import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class DetailPresenter @Inject constructor(
@@ -25,37 +23,39 @@ class DetailPresenter @Inject constructor(
 
     override fun onTeamNameRetrieved(teamName: String) {
         scope.launch(Dispatchers.IO) {
-            combine(
-                // STEP 6: API call
-                flowOf(sportRepository.getTeamByName(teamName)),
-                searchRepository.getSearchedLeagueNameFlow(),
-            ) { team, searchedLeagueName ->
 
-                // STEP 7: Handle API response
-                if (team != null) {
-                    val detailUiModel = DetailUiModel(
-                        toolbarTitle = team.strTeam?.let {
-                            LocalText.Simple(content = it)
-                        } ?: LocalText.Res(stringId = R.string.unavailable_name),
-                        bannerImageUrl = team.strTeamBanner,
-                        country = team.strCountry?.let {
-                            LocalText.Simple(content = it)
-                        } ?: LocalText.Res(stringId = R.string.unavailable_country),
-                        league = LocalText.Simple(content = searchedLeagueName),
-                        description = team.strDescriptionEN?.let {
-                            LocalText.Simple(content = it)
-                        } ?: LocalText.Res(R.string.unavailable_description),
-                    )
+            // STEP 6: API call
+            val team = withTimeout(30_000) {
+                sportRepository.getTeamByName(teamName)
+            }
 
-                    withContext(Dispatchers.Main) {
-                        detailView?.showDetailInfo(detailUiModel)
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        detailView?.showErrorToast()
-                    }
+            // Do NOT keep collecting the flow, only a snapshot is needed here
+            val searchedLeagueName = searchRepository.getSearchedLeagueNameFlow().first()
+
+            // STEP 7: Handle API response
+            if (team != null) {
+                val detailUiModel = DetailUiModel(
+                    toolbarTitle = team.strTeam?.let {
+                        LocalText.Simple(content = it)
+                    } ?: LocalText.Res(stringId = R.string.unavailable_name),
+                    bannerImageUrl = team.strTeamBanner,
+                    country = team.strCountry?.let {
+                        LocalText.Simple(content = it)
+                    } ?: LocalText.Res(stringId = R.string.unavailable_country),
+                    league = LocalText.Simple(content = searchedLeagueName),
+                    description = team.strDescriptionEN?.let {
+                        LocalText.Simple(content = it)
+                    } ?: LocalText.Res(R.string.unavailable_description),
+                )
+
+                withContext(Dispatchers.Main) {
+                    detailView?.showDetailInfo(detailUiModel)
                 }
-            }.collect()
+            } else {
+                withContext(Dispatchers.Main) {
+                    detailView?.showErrorToast()
+                }
+            }
         }
     }
 
