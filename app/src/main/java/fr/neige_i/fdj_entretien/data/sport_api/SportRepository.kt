@@ -2,8 +2,6 @@ package fr.neige_i.fdj_entretien.data.sport_api
 
 import fr.neige_i.fdj_entretien.data.sport_api.model.LeagueResponse
 import fr.neige_i.fdj_entretien.data.sport_api.model.TeamResponse
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,19 +10,15 @@ class SportRepository @Inject constructor(
     private val sportDataSource: SportDataSource,
 ) {
 
-    fun getTeamsByLeagueFlow(leagueName: String): Flow<List<TeamResponse>?> = flow {
-        emit(sportDataSource.getTeamsByLeague(leagueName).teams)
+    companion object {
+        private const val SOCCER_LEAGUE_FILTER = "Soccer"
     }
 
-    fun getTeamByNameFlow(teamName: String): Flow<TeamResponse?> = flow {
-        emit(sportDataSource.getTeamByName(teamName).teams?.get(0))
-    }
+    suspend fun getTeamsByLeague(leagueName: String): List<TeamResponse>? = sportDataSource.getTeamsByLeague(leagueName).teams
 
-    fun getSoccerLeaguesFlow(): Flow<List<LeagueResponse>> = flow {
-        sportDataSource.getAllLeagues().leagues?.let { allLeagues ->
-            emit(
-                allLeagues.filter { it.strSport?.equals("Soccer") == true }
-            )
-        }
-    }
+    suspend fun getTeamByName(teamName: String): TeamResponse? = sportDataSource.getTeamByName(teamName).teams?.getOrNull(0)
+
+    suspend fun getSoccerLeagues(): List<LeagueResponse> = sportDataSource.getAllLeagues().leagues?.let { allLeagues ->
+        allLeagues.filter { it.strSport?.equals(SOCCER_LEAGUE_FILTER) == true }
+    } ?: emptyList()
 }

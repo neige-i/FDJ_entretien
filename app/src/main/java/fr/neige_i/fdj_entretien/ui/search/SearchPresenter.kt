@@ -6,7 +6,7 @@ import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -26,7 +26,7 @@ class SearchPresenter @Inject constructor(
         launch {
             searchRepository.getSearchedLeagueNameFlow().collectLatest { searchedLeagueName ->
                 // STEP 2: API call
-                sportRepository.getTeamsByLeagueFlow(searchedLeagueName).collectLatest { teamResponses ->
+                flowOf(sportRepository.getTeamsByLeague(searchedLeagueName)).collectLatest { teamResponses ->
                     // STEP 3: Handle API response
                     if (teamResponses == null) {
                         withContext(Dispatchers.Main) {
@@ -67,7 +67,7 @@ class SearchPresenter @Inject constructor(
                 val autocompleteStates = if (currentQuery.isBlank()) {
                     emptyList()
                 } else {
-                    sportRepository.getSoccerLeaguesFlow().first()
+                    sportRepository.getSoccerLeagues()
                         .filter { league ->
                             league.strLeague?.contains(currentQuery, ignoreCase = true) == true ||
                                     league.strLeagueAlternate?.contains(currentQuery, ignoreCase = true) == true

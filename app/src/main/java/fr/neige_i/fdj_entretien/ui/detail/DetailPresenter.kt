@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -27,7 +28,7 @@ class DetailPresenter @Inject constructor(
         launch {
             combine(
                 // STEP 6: API call
-                sportRepository.getTeamByNameFlow(teamName).filterNotNull(),
+                flowOf(sportRepository.getTeamByName(teamName)).filterNotNull(),
                 searchRepository.getSearchedLeagueNameFlow(),
             ) { team, searchedLeagueName ->
 
