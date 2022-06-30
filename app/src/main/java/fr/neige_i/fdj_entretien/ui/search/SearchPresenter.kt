@@ -26,7 +26,7 @@ class SearchPresenter @Inject constructor(
             searchRepository.getSearchedLeagueNameFlow()
                 .flatMapLatest { searchedLeagueName ->
                     // STEP 2: API call
-                    flowOf(sportRepository.getTeamsByLeague(searchedLeagueName))
+                    flowOf(sportRepository.getSoccerTeamsByLeague(searchedLeagueName))
                 }
                 .collectLatest { teamResponses ->
                     // STEP 3: Handle API response
