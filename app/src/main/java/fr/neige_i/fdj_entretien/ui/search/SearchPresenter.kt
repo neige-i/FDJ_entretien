@@ -19,6 +19,8 @@ class SearchPresenter @Inject constructor(
 
     private var searchView: SearchContract.View? = null
 
+    private var isSearchViewExpanded = false
+
     override fun onCreated(searchView: SearchContract.View) {
         this.searchView = searchView
 
@@ -83,12 +85,17 @@ class SearchPresenter @Inject constructor(
                 withContext(Dispatchers.Main) {
                     searchView?.showAutocompleteSuggestions(autocompleteUiModels)
 
-                    if (currentQuery.isNotEmpty()) {
+                    if (currentQuery.isNotEmpty() && !isSearchViewExpanded) {
                         searchView?.expandSearchView(currentQuery)
                     }
                 }
             }
         }
+    }
+
+    override fun onSearchViewExpanded(isExpanded: Boolean) {
+        isSearchViewExpanded = isExpanded
+        searchView?.setAutocompleteVisibility(isExpanded)
     }
 
     override fun onSearchModified(leagueName: String) {

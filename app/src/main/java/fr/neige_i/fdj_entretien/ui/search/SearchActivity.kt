@@ -68,12 +68,12 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
 
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                setAutocompleteVisibility(true)
+                presenter.onSearchViewExpanded(true)
                 return true
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                setAutocompleteVisibility(false)
+                presenter.onSearchViewExpanded(false)
                 return true
             }
         })
