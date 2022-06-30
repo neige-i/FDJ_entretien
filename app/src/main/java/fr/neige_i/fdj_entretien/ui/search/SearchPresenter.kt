@@ -37,15 +37,13 @@ class SearchPresenter @Inject constructor(
                                 args = listOf(teamResponses.size, searchedLeagueName)
                             ),
                             teamUiModels = teamResponses.mapNotNull { teamResponse ->
-                                if (teamResponse.idTeam != null && teamResponse.strTeamBadge != null && teamResponse.strTeam != null) {
-                                    TeamUiModel(
-                                        id = teamResponse.idTeam,
-                                        badgeImageUrl = teamResponse.strTeamBadge,
-                                        onClicked = { searchView.openTeamDetails(teamName = teamResponse.strTeam) }
-                                    )
-                                } else {
-                                    null
-                                }
+                                TeamUiModel(
+                                    id = teamResponse.idTeam ?: return@mapNotNull null,
+                                    badgeImageUrl = teamResponse.strTeamBadge ?: return@mapNotNull null,
+                                    onClicked = teamResponse.strTeam?.let {
+                                        { searchView.openTeamDetails(teamName = it) }
+                                    } ?: return@mapNotNull null
+                                )
                             }
                         )
 
@@ -71,15 +69,11 @@ class SearchPresenter @Inject constructor(
                                     league.strLeagueAlternate?.contains(currentQuery, ignoreCase = true) == true
                         }
                         .mapNotNull { league ->
-                            if (league.idLeague != null && league.strLeague != null) {
-                                AutocompleteUiModel(
-                                    id = league.idLeague,
-                                    suggestion = league.strLeague,
-                                    onClicked = { searchView?.setSearchQuery(league.strLeague) }
-                                )
-                            } else {
-                                null
-                            }
+                            AutocompleteUiModel(
+                                id = league.idLeague ?: return@mapNotNull null,
+                                suggestion = league.strLeague ?: return@mapNotNull null,
+                                onClicked = { searchView?.setSearchQuery(league.strLeague) }
+                            )
                         }
                 }
 
