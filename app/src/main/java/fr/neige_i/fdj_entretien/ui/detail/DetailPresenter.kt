@@ -34,6 +34,20 @@ class DetailPresenter @Inject constructor(
 
             // STEP 7: Handle API response
             if (team != null) {
+                val leagueToDisplay = searchedLeagueName.ifEmpty {
+                    listOf(
+                        team.strLeague,
+                        team.strLeague2,
+                        team.strLeague3,
+                        team.strLeague4,
+                        team.strLeague5,
+                        team.strLeague6,
+                        team.strLeague7,
+                    ).filterNot { league ->
+                        league.isNullOrEmpty()
+                    }.joinToString()
+                }
+
                 val detailUiModel = DetailUiModel(
                     toolbarTitle = team.strTeam?.let {
                         LocalText.Simple(content = it)
@@ -42,7 +56,7 @@ class DetailPresenter @Inject constructor(
                     country = team.strCountry?.let {
                         LocalText.Simple(content = it)
                     } ?: LocalText.Res(stringId = R.string.unavailable_country),
-                    league = LocalText.Simple(content = searchedLeagueName),
+                    league = LocalText.Simple(content = leagueToDisplay),
                     description = team.strDescriptionEN?.let {
                         LocalText.Simple(content = it)
                     } ?: LocalText.Res(R.string.unavailable_description),
