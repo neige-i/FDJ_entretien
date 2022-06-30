@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.databinding.ItemTeamBinding
 
-class TeamAdapter : ListAdapter<TeamState, TeamAdapter.TeamViewHolder>(TeamDiffUtil()) {
+class TeamAdapter : ListAdapter<TeamState, TeamAdapter.TeamViewHolder>(TeamDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TeamViewHolder(
         ItemTeamBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -33,14 +33,10 @@ class TeamAdapter : ListAdapter<TeamState, TeamAdapter.TeamViewHolder>(TeamDiffU
         }
     }
 
-    class TeamDiffUtil : DiffUtil.ItemCallback<TeamState>() {
+    object TeamDiffUtil : DiffUtil.ItemCallback<TeamState>() {
 
-        override fun areItemsTheSame(oldItem: TeamState, newItem: TeamState): Boolean {
-            return oldItem.id == newItem.id
-        }
+        override fun areItemsTheSame(oldItem: TeamState, newItem: TeamState): Boolean = oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: TeamState, newItem: TeamState): Boolean {
-            return oldItem == newItem
-        }
+        override fun areContentsTheSame(oldItem: TeamState, newItem: TeamState): Boolean = oldItem == newItem
     }
 }
