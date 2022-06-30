@@ -8,22 +8,20 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class SearchPresenter @Inject constructor(
     private val sportRepository: SportRepository,
     private val searchRepository: SearchRepository,
-) : SearchContract.Presenter, CoroutineScope {
+) : SearchContract.Presenter {
 
-    private val job = Job()
-    override val coroutineContext: CoroutineContext = job + Dispatchers.IO
+    private val scope = CoroutineScope(SupervisorJob())
 
     private var searchView: SearchContract.View? = null
 
     override fun onCreated(searchView: SearchContract.View) {
         this.searchView = searchView
 
-        launch {
+        scope.launch(Dispatchers.IO) {
             searchRepository.getSearchedLeagueNameFlow().collectLatest { searchedLeagueName ->
                 // STEP 2: API call
                 flowOf(sportRepository.getTeamsByLeague(searchedLeagueName)).collectLatest { teamResponses ->
@@ -61,7 +59,7 @@ class SearchPresenter @Inject constructor(
     }
 
     override fun onMenuCreated() {
-        launch {
+        scope.launch(Dispatchers.IO) {
             searchRepository.getCurrentQueryFlow().collectLatest { currentQuery ->
 
                 val autocompleteStates = if (currentQuery.isBlank()) {
@@ -107,7 +105,7 @@ class SearchPresenter @Inject constructor(
     }
 
     override fun onDestroy() {
-        job.cancel()
+        scope.cancel()
         searchView = null // To prevent leaks
     }
 }

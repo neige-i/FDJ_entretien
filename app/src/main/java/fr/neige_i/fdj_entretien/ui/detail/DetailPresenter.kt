@@ -8,15 +8,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class DetailPresenter @Inject constructor(
     private val sportRepository: SportRepository,
     private val searchRepository: SearchRepository,
-) : DetailContract.Presenter, CoroutineScope {
+) : DetailContract.Presenter {
 
-    private val job = Job()
-    override val coroutineContext: CoroutineContext = job + Dispatchers.IO
+    private val scope = CoroutineScope(SupervisorJob())
 
     private var detailView: DetailContract.View? = null
 
@@ -25,7 +23,7 @@ class DetailPresenter @Inject constructor(
     }
 
     override fun onTeamNameRetrieved(teamName: String) {
-        launch {
+        scope.launch(Dispatchers.IO) {
             combine(
                 // STEP 6: API call
                 flowOf(sportRepository.getTeamByName(teamName)).filterNotNull(),
@@ -52,5 +50,6 @@ class DetailPresenter @Inject constructor(
 
     override fun onDestroy() {
         detailView = null // To prevent leaks
+        scope.cancel()
     }
 }
