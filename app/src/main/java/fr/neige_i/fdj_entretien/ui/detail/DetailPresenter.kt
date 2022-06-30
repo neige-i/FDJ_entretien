@@ -32,7 +32,7 @@ class DetailPresenter @Inject constructor(
 
                 // STEP 7: Handle API response
                 if (team.strTeam != null && team.strCountry != null && team.strDescriptionEN != null) {
-                    val detailState = DetailState(
+                    val detailUiModel = DetailUiModel(
                         toolbarTitle = team.strTeam,
                         bannerImageUrl = team.strTeamBanner,
                         country = team.strCountry,
@@ -41,7 +41,7 @@ class DetailPresenter @Inject constructor(
                     )
 
                     withContext(Dispatchers.Main) {
-                        detailView?.showDetailInfo(detailState)
+                        detailView?.showDetailInfo(detailUiModel)
                     }
                 }
             }.collect()

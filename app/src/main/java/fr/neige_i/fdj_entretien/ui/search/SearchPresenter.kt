@@ -31,14 +31,14 @@ class SearchPresenter @Inject constructor(
                             searchView.showErrorToast()
                         }
                     } else {
-                        val searchState = SearchState(
+                        val searchUiModel = SearchUiModel(
                             resultCountText = LocalText.ResWithArgs(
                                 stringId = R.string.team_count_in_league,
                                 args = listOf(teamResponses.size, searchedLeagueName)
                             ),
-                            teamStates = teamResponses.mapNotNull { teamResponse ->
+                            teamUiModels = teamResponses.mapNotNull { teamResponse ->
                                 if (teamResponse.idTeam != null && teamResponse.strTeamBadge != null && teamResponse.strTeam != null) {
-                                    TeamState(
+                                    TeamUiModel(
                                         id = teamResponse.idTeam,
                                         badgeImageUrl = teamResponse.strTeamBadge,
                                         onClicked = { searchView.openTeamDetails(teamName = teamResponse.strTeam) }
@@ -50,7 +50,7 @@ class SearchPresenter @Inject constructor(
                         )
 
                         withContext(Dispatchers.Main) {
-                            searchView.showSearchResults(searchState)
+                            searchView.showSearchResults(searchUiModel)
                         }
                     }
                 }
@@ -62,7 +62,7 @@ class SearchPresenter @Inject constructor(
         scope.launch(Dispatchers.IO) {
             searchRepository.getCurrentQueryFlow().collectLatest { currentQuery ->
 
-                val autocompleteStates = if (currentQuery.isBlank()) {
+                val autocompleteUiModels = if (currentQuery.isBlank()) {
                     emptyList()
                 } else {
                     sportRepository.getSoccerLeagues()
@@ -72,7 +72,7 @@ class SearchPresenter @Inject constructor(
                         }
                         .mapNotNull { league ->
                             if (league.idLeague != null && league.strLeague != null) {
-                                AutocompleteState(
+                                AutocompleteUiModel(
                                     id = league.idLeague,
                                     suggestion = league.strLeague,
                                     onClicked = { searchView?.setSearchQuery(league.strLeague) }
@@ -84,7 +84,7 @@ class SearchPresenter @Inject constructor(
                 }
 
                 withContext(Dispatchers.Main) {
-                    searchView?.showAutocompleteSuggestions(autocompleteStates)
+                    searchView?.showAutocompleteSuggestions(autocompleteUiModels)
 
                     if (currentQuery.isNotEmpty()) {
                         searchView?.expandSearchView(currentQuery)

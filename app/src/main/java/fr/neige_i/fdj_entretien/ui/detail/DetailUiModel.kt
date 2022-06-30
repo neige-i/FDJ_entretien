@@ -1,6 +1,6 @@
 package fr.neige_i.fdj_entretien.ui.detail
 
-data class DetailState(
+data class DetailUiModel(
     val toolbarTitle: String,
     val bannerImageUrl: String?,
     val country: String,

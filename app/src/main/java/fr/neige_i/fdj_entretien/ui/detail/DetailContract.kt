@@ -3,7 +3,7 @@ package fr.neige_i.fdj_entretien.ui.detail
 interface DetailContract {
 
     interface View {
-        fun showDetailInfo(detailState: DetailState)
+        fun showDetailInfo(detailUiModel: DetailUiModel)
     }
 
     interface Presenter {

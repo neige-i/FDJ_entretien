@@ -99,13 +99,13 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
         binding.searchSuggestions.isVisible = isAutocompleteVisible
     }
 
-    override fun showAutocompleteSuggestions(autocompleteStates: List<AutocompleteState>) {
-        autocompleteAdapter.submitList(autocompleteStates)
+    override fun showAutocompleteSuggestions(autocompleteUiModels: List<AutocompleteUiModel>) {
+        autocompleteAdapter.submitList(autocompleteUiModels)
     }
 
-    override fun showSearchResults(searchState: SearchState) {
-        binding.searchResultCountTxt.text = searchState.resultCountText.toCharSequence(this@SearchActivity)
-        teamAdapter.submitList(searchState.teamStates)
+    override fun showSearchResults(searchUiModel: SearchUiModel) {
+        binding.searchResultCountTxt.text = searchUiModel.resultCountText.toCharSequence(this@SearchActivity)
+        teamAdapter.submitList(searchUiModel.teamUiModels)
     }
 
     override fun openTeamDetails(teamName: String) {

@@ -49,18 +49,18 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
     }
 
     // STEP 8: Show team detail info
-    override fun showDetailInfo(detailState: DetailState) {
-        title = detailState.toolbarTitle
+    override fun showDetailInfo(detailUiModel: DetailUiModel) {
+        title = detailUiModel.toolbarTitle
 
         Glide
             .with(this@DetailActivity)
-            .load(detailState.bannerImageUrl)
+            .load(detailUiModel.bannerImageUrl)
             .error(R.drawable.ic_no_image)
             .into(binding.teamBannerImg)
 
-        binding.teamCountryTxt.text = detailState.country
-        binding.teamLeagueTxt.text = detailState.league
+        binding.teamCountryTxt.text = detailUiModel.country
+        binding.teamLeagueTxt.text = detailUiModel.league
 
-        binding.teamDescriptionText.text = detailState.description
+        binding.teamDescriptionText.text = detailUiModel.description
     }
 }

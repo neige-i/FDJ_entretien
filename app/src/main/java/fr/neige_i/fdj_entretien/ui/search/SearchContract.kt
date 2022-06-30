@@ -6,8 +6,8 @@ interface SearchContract {
         fun setSearchQuery(searchQuery: String)
         fun expandSearchView(searchQuery: String)
         fun setAutocompleteVisibility(isAutocompleteVisible: Boolean)
-        fun showAutocompleteSuggestions(autocompleteStates: List<AutocompleteState>)
-        fun showSearchResults(searchState: SearchState)
+        fun showAutocompleteSuggestions(autocompleteUiModels: List<AutocompleteUiModel>)
+        fun showSearchResults(searchUiModel: SearchUiModel)
         fun openTeamDetails(teamName: String)
         fun showErrorToast()
     }
