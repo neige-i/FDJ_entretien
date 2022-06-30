@@ -1,5 +1,7 @@
 package fr.neige_i.fdj_entretien.ui.detail
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +16,11 @@ import javax.inject.Inject
 class DetailActivity : AppCompatActivity(), DetailContract.View {
 
     companion object {
-        const val EXTRA_TEAM_NAME = "EXTRA_TEAM_ID"
+        private const val EXTRA_TEAM_NAME = "EXTRA_TEAM_NAME"
+
+        fun navigate(context: Context, teamName: String) = Intent(context, DetailActivity::class.java).apply {
+            putExtra(EXTRA_TEAM_NAME, teamName)
+        }
     }
 
     private val binding by viewBinding { layoutInflater -> ActivityDetailBinding.inflate(layoutInflater) }

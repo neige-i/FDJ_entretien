@@ -1,6 +1,5 @@
 package fr.neige_i.fdj_entretien.ui.search
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -110,10 +109,7 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
     }
 
     override fun openTeamDetails(teamName: String) {
-        startActivity(
-            Intent(this, DetailActivity::class.java)
-                .putExtra(DetailActivity.EXTRA_TEAM_NAME, teamName)
-        )
+        startActivity(DetailActivity.navigate(this, teamName))
     }
 
     override fun showErrorToast() {
