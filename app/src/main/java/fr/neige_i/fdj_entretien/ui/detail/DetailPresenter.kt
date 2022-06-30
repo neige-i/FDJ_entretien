@@ -1,11 +1,12 @@
 package fr.neige_i.fdj_entretien.ui.detail
 
+import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.data.search.SearchRepository
 import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
+import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
@@ -26,22 +27,32 @@ class DetailPresenter @Inject constructor(
         scope.launch(Dispatchers.IO) {
             combine(
                 // STEP 6: API call
-                flowOf(sportRepository.getTeamByName(teamName)).filterNotNull(),
+                flowOf(sportRepository.getTeamByName(teamName)),
                 searchRepository.getSearchedLeagueNameFlow(),
             ) { team, searchedLeagueName ->
 
                 // STEP 7: Handle API response
-                if (team.strTeam != null && team.strCountry != null && team.strDescriptionEN != null) {
+                if (team != null) {
                     val detailUiModel = DetailUiModel(
-                        toolbarTitle = team.strTeam,
+                        toolbarTitle = team.strTeam?.let {
+                            LocalText.Simple(content = it)
+                        } ?: LocalText.Res(stringId = R.string.unavailable_name),
                         bannerImageUrl = team.strTeamBanner,
-                        country = team.strCountry,
-                        league = searchedLeagueName,
-                        description = team.strDescriptionEN,
+                        country = team.strCountry?.let {
+                            LocalText.Simple(content = it)
+                        } ?: LocalText.Res(stringId = R.string.unavailable_country),
+                        league = LocalText.Simple(content = searchedLeagueName),
+                        description = team.strDescriptionEN?.let {
+                            LocalText.Simple(content = it)
+                        } ?: LocalText.Res(R.string.unavailable_description),
                     )
 
                     withContext(Dispatchers.Main) {
                         detailView?.showDetailInfo(detailUiModel)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        detailView?.showErrorToast()
                     }
                 }
             }.collect()

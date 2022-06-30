@@ -4,6 +4,7 @@ interface DetailContract {
 
     interface View {
         fun showDetailInfo(detailUiModel: DetailUiModel)
+        fun showErrorToast()
     }
 
     interface Presenter {

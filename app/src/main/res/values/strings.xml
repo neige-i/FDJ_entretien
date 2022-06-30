@@ -10,4 +10,10 @@
     <string name="team_count_in_league">There are %d teams in %s</string>
 
     <string name="no_team_found_error">No teams found for this league</string>
+    <string name="detail_loading_error">An error occurred when loading the detail info</string>
+
+    <string name="unavailable_name">Team name unavailable</string>
+    <string name="unavailable_country">Team country unavailable</string>
+    <string name="unavailable_league">Team league unavailable</string>
+    <string name="unavailable_description">Team description unavailable</string>
 </resources>
