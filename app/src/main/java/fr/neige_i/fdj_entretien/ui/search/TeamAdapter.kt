@@ -25,6 +25,7 @@ class TeamAdapter : ListAdapter<TeamUiModel, TeamAdapter.TeamViewHolder>(TeamDif
             Glide
                 .with(binding.teamBadgeImg)
                 .load(team.badgeImageUrl)
+                .placeholder(R.drawable.ic_image)
                 .error(R.drawable.ic_no_image)
                 .into(binding.teamBadgeImg)
 

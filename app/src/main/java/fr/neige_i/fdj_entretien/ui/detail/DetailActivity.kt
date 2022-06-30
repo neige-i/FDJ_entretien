@@ -57,6 +57,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         Glide
             .with(this@DetailActivity)
             .load(detailUiModel.bannerImageUrl)
+            .placeholder(R.drawable.ic_image)
             .error(R.drawable.ic_no_image)
             .into(binding.teamBannerImg)
 
