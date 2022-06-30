@@ -7,7 +7,7 @@
     <string name="team_badge_image">Team badge image</string>
     <string name="team_banner_image">Team banner image</string>
 
-    <string name="team_count_in_league">There are %d teams in %s</string>
+    <string name="team_count_in_league">There are %d teams</string>
 
     <string name="no_team_found_error">No teams found for this league</string>
     <string name="detail_loading_error">An error occurred when loading the detail info</string>

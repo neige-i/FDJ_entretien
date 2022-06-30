@@ -6,6 +6,7 @@ import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
@@ -22,9 +23,12 @@ class SearchPresenter @Inject constructor(
         this.searchView = searchView
 
         scope.launch(Dispatchers.IO) {
-            searchRepository.getSearchedLeagueNameFlow().collectLatest { searchedLeagueName ->
-                // STEP 2: API call
-                flowOf(sportRepository.getTeamsByLeague(searchedLeagueName)).collectLatest { teamResponses ->
+            searchRepository.getSearchedLeagueNameFlow()
+                .flatMapLatest { searchedLeagueName ->
+                    // STEP 2: API call
+                    flowOf(sportRepository.getTeamsByLeague(searchedLeagueName))
+                }
+                .collectLatest { teamResponses ->
                     // STEP 3: Handle API response
                     if (teamResponses == null) {
                         withContext(Dispatchers.Main) {
@@ -34,7 +38,7 @@ class SearchPresenter @Inject constructor(
                         val searchUiModel = SearchUiModel(
                             resultCountText = LocalText.ResWithArgs(
                                 stringId = R.string.team_count_in_league,
-                                args = listOf(teamResponses.size, searchedLeagueName)
+                                args = listOf(teamResponses.size)
                             ),
                             teamUiModels = teamResponses.mapNotNull { teamResponse ->
                                 TeamUiModel(
@@ -52,7 +56,6 @@ class SearchPresenter @Inject constructor(
                         }
                     }
                 }
-            }
         }
     }
 
