@@ -1,94 +1,90 @@
 package fr.neige_i.fdj_entretien.ui.search
 
 import fr.neige_i.fdj_entretien.R
-import fr.neige_i.fdj_entretien.data.search.SearchRepository
-import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
+import fr.neige_i.fdj_entretien.data.sport_api.model.TeamResponse
+import fr.neige_i.fdj_entretien.domain.DataResult
+import fr.neige_i.fdj_entretien.domain.search.GetAutocompleteResultUseCase
+import fr.neige_i.fdj_entretien.domain.search.GetSearchResultUseCase
+import fr.neige_i.fdj_entretien.domain.search.UpdateSearchUseCase
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class SearchPresenter @Inject constructor(
-    private val sportRepository: SportRepository,
-    private val searchRepository: SearchRepository,
-) : SearchContract.Presenter, CoroutineScope {
+    private val getSearchResultUseCase: GetSearchResultUseCase,
+    private val getAutocompleteResultUseCase: GetAutocompleteResultUseCase,
+    private val updateSearchUseCase: UpdateSearchUseCase,
+) : SearchContract.Presenter {
 
-    private val job = Job()
-    override val coroutineContext: CoroutineContext = job + Dispatchers.IO
+    private val scope = CoroutineScope(SupervisorJob())
 
     private var searchView: SearchContract.View? = null
+
+    private var isSearchViewExpanded = false
 
     override fun onCreated(searchView: SearchContract.View) {
         this.searchView = searchView
 
-        launch {
-            searchRepository.getSearchedLeagueNameFlow().collectLatest { searchedLeagueName ->
-                // STEP 2: API call
-                sportRepository.getTeamsByLeagueFlow(searchedLeagueName).collectLatest { teamResponses ->
-                    // STEP 3: Handle API response
-                    if (teamResponses == null) {
-                        withContext(Dispatchers.Main) {
-                            searchView.showErrorToast()
-                        }
-                    } else {
-                        val searchState = SearchState(
-                            resultCountText = LocalText.ResWithArgs(
-                                stringId = R.string.team_count_in_league,
-                                args = listOf(teamResponses.size, searchedLeagueName)
-                            ),
-                            teamStates = teamResponses.mapNotNull { teamResponse ->
-                                if (teamResponse.idTeam != null && teamResponse.strTeamBadge != null && teamResponse.strTeam != null) {
-                                    TeamState(
-                                        id = teamResponse.idTeam,
-                                        badgeImageUrl = teamResponse.strTeamBadge,
-                                        onClicked = { searchView.openTeamDetails(teamName = teamResponse.strTeam) }
-                                    )
-                                } else {
-                                    null
-                                }
-                            }
+        scope.launch(Dispatchers.IO) {
+            getSearchResultUseCase.invoke().collectLatest { searchResult ->
+                // STEP 3: Handle API response
+                withContext(Dispatchers.Main) {
+                    when (searchResult) {
+                        is DataResult.Content -> searchView.showSearchResults(
+                            mapUiModel(teamResponses = searchResult.data)
                         )
-
-                        withContext(Dispatchers.Main) {
-                            searchView.showSearchResults(searchState)
-                        }
+                        is DataResult.Error -> searchView.showErrorToast(searchResult.errorMessage)
                     }
                 }
             }
         }
     }
 
-    override fun onMenuCreated() {
-        launch {
-            searchRepository.getCurrentQueryFlow().collectLatest { currentQuery ->
+    private fun mapUiModel(teamResponses: List<TeamResponse>): SearchUiModel {
+        val teamList = teamResponses.mapNotNull { teamResponse ->
+            TeamUiModel(
+                id = teamResponse.idTeam ?: return@mapNotNull null,
+                badgeImageUrl = teamResponse.strTeamBadge ?: return@mapNotNull null,
+                onClicked = teamResponse.strTeam
+                    ?.let {
+                        { searchView?.openTeamDetails(teamName = it) }
+                    }
+                    ?: return@mapNotNull null
+            )
+        }
 
-                val autocompleteStates = if (currentQuery.isBlank()) {
-                    emptyList()
-                } else {
-                    sportRepository.getSoccerLeaguesFlow().first()
-                        .filter { league ->
-                            league.strLeague?.contains(currentQuery, ignoreCase = true) == true ||
-                                    league.strLeagueAlternate?.contains(currentQuery, ignoreCase = true) == true
-                        }
-                        .mapNotNull { league ->
-                            if (league.idLeague != null && league.strLeague != null) {
-                                AutocompleteState(
-                                    id = league.idLeague,
-                                    suggestion = league.strLeague,
-                                    onClicked = { searchView?.setSearchQuery(league.strLeague) }
-                                )
-                            } else {
-                                null
-                            }
-                        }
-                }
+        return SearchUiModel(
+            resultCountText = LocalText.ResWithArgs(
+                stringId = R.string.team_count_in_league,
+                args = listOf(teamResponses.size)
+            ),
+            teamUiModels = teamList,
+        )
+    }
+
+    override fun onMenuCreated() {
+        scope.launch(Dispatchers.IO) {
+            getAutocompleteResultUseCase.invoke().collectLatest { autocompleteResult ->
 
                 withContext(Dispatchers.Main) {
-                    searchView?.showAutocompleteSuggestions(autocompleteStates)
+                    val currentQuery = autocompleteResult.currentQuery
 
-                    if (currentQuery.isNotEmpty()) {
+                    when (val suggestionsResult = autocompleteResult.suggestedLeagues) {
+                        is DataResult.Content -> {
+                            val autocompleteUiModels = suggestionsResult.data.mapNotNull { league ->
+                                AutocompleteUiModel(
+                                    id = league.idLeague ?: return@mapNotNull null,
+                                    suggestion = league.strLeague ?: return@mapNotNull null,
+                                    onClicked = { searchView?.setSearchQuery(league.strLeague) }
+                                )
+                            }
+                            searchView?.showAutocompleteSuggestions(autocompleteUiModels)
+                        }
+                        is DataResult.Error -> searchView?.showErrorToast(suggestionsResult.errorMessage)
+                    }
+
+                    if (currentQuery.isNotEmpty() && !isSearchViewExpanded) {
                         searchView?.expandSearchView(currentQuery)
                     }
                 }
@@ -96,18 +92,23 @@ class SearchPresenter @Inject constructor(
         }
     }
 
+    override fun onSearchViewExpanded(isExpanded: Boolean) {
+        isSearchViewExpanded = isExpanded
+        searchView?.setAutocompleteVisibility(isExpanded)
+    }
+
     override fun onSearchModified(leagueName: String) {
-        searchRepository.setCurrentQuery(leagueName)
+        updateSearchUseCase.setCurrentQuery(leagueName)
         searchView?.setAutocompleteVisibility(true)
     }
 
     override fun onSearchSubmitted(leagueName: String) {
-        searchRepository.setSearchedLeagueName(leagueName)
+        updateSearchUseCase.setSubmittedQuery(leagueName)
         searchView?.setAutocompleteVisibility(false)
     }
 
     override fun onDestroy() {
-        job.cancel()
+        scope.cancel()
         searchView = null // To prevent leaks
     }
 }

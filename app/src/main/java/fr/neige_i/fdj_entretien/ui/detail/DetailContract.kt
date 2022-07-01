@@ -1,9 +1,12 @@
 package fr.neige_i.fdj_entretien.ui.detail
 
+import androidx.annotation.StringRes
+
 interface DetailContract {
 
     interface View {
-        fun showDetailInfo(detailState: DetailState)
+        fun showDetailInfo(detailUiModel: DetailUiModel)
+        fun showErrorToast(@StringRes message: Int)
     }
 
     interface Presenter {

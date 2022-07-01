@@ -7,7 +7,17 @@
     <string name="team_badge_image">Team badge image</string>
     <string name="team_banner_image">Team banner image</string>
 
-    <string name="team_count_in_league">There are %d teams in %s</string>
+    <string name="team_count_in_league">There are %d teams</string>
 
-    <string name="no_team_found_error">No teams found for this league</string>
+    <string name="load_team_list_error">Error loading teams from internet</string>
+    <string name="load_team_error">Error loading team detail from internet</string>
+    <string name="load_leagues_error">Error loading leagues from internet</string>
+    <string name="team_list_api_error">No teams found for this league</string>
+    <string name="team_api_error">An error occurred while parsing team detail info</string>
+    <string name="leagues_api_error">An error occurred while parsing leagues results</string>
+
+    <string name="unavailable_name">Team name unavailable</string>
+    <string name="unavailable_country">Team country unavailable</string>
+    <string name="unavailable_league">Team league unavailable</string>
+    <string name="unavailable_description">Team description unavailable</string>
 </resources>

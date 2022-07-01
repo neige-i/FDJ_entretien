@@ -1,10 +1,10 @@
 package fr.neige_i.fdj_entretien.ui.search
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -69,12 +69,12 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
 
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                setAutocompleteVisibility(true)
+                presenter.onSearchViewExpanded(true)
                 return true
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                setAutocompleteVisibility(false)
+                presenter.onSearchViewExpanded(false)
                 return true
             }
         })
@@ -100,23 +100,20 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
         binding.searchSuggestions.isVisible = isAutocompleteVisible
     }
 
-    override fun showAutocompleteSuggestions(autocompleteStates: List<AutocompleteState>) {
-        autocompleteAdapter.submitList(autocompleteStates)
+    override fun showAutocompleteSuggestions(autocompleteUiModels: List<AutocompleteUiModel>) {
+        autocompleteAdapter.submitList(autocompleteUiModels)
     }
 
-    override fun showSearchResults(searchState: SearchState) {
-        binding.searchResultCountTxt.text = searchState.resultCountText.toCharSequence(this@SearchActivity)
-        teamAdapter.submitList(searchState.teamStates)
+    override fun showSearchResults(searchUiModel: SearchUiModel) {
+        binding.searchResultCountTxt.text = searchUiModel.resultCountText.toCharSequence(this@SearchActivity)
+        teamAdapter.submitList(searchUiModel.teamUiModels)
     }
 
     override fun openTeamDetails(teamName: String) {
-        startActivity(
-            Intent(this, DetailActivity::class.java)
-                .putExtra(DetailActivity.EXTRA_TEAM_NAME, teamName)
-        )
+        startActivity(DetailActivity.navigate(this, teamName))
     }
 
-    override fun showErrorToast() {
-        Toast.makeText(this, R.string.no_team_found_error, Toast.LENGTH_SHORT).show()
+    override fun showErrorToast(@StringRes message: Int) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

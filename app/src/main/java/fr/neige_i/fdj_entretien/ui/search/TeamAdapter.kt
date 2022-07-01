@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.databinding.ItemTeamBinding
 
-class TeamAdapter : ListAdapter<TeamState, TeamAdapter.TeamViewHolder>(TeamDiffUtil()) {
+class TeamAdapter : ListAdapter<TeamUiModel, TeamAdapter.TeamViewHolder>(TeamDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TeamViewHolder(
         ItemTeamBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -21,10 +21,11 @@ class TeamAdapter : ListAdapter<TeamState, TeamAdapter.TeamViewHolder>(TeamDiffU
 
     class TeamViewHolder(private val binding: ItemTeamBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(team: TeamState) {
+        fun bind(team: TeamUiModel) {
             Glide
                 .with(binding.teamBadgeImg)
                 .load(team.badgeImageUrl)
+                .placeholder(R.drawable.ic_image)
                 .error(R.drawable.ic_no_image)
                 .into(binding.teamBadgeImg)
 
@@ -33,14 +34,10 @@ class TeamAdapter : ListAdapter<TeamState, TeamAdapter.TeamViewHolder>(TeamDiffU
         }
     }
 
-    class TeamDiffUtil : DiffUtil.ItemCallback<TeamState>() {
+    object TeamDiffUtil : DiffUtil.ItemCallback<TeamUiModel>() {
 
-        override fun areItemsTheSame(oldItem: TeamState, newItem: TeamState): Boolean {
-            return oldItem.id == newItem.id
-        }
+        override fun areItemsTheSame(oldItem: TeamUiModel, newItem: TeamUiModel): Boolean = oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: TeamState, newItem: TeamState): Boolean {
-            return oldItem == newItem
-        }
+        override fun areContentsTheSame(oldItem: TeamUiModel, newItem: TeamUiModel): Boolean = oldItem == newItem
     }
 }

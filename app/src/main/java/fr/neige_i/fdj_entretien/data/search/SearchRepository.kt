@@ -8,7 +8,10 @@ import javax.inject.Singleton
 @Singleton
 class SearchRepository @Inject constructor() {
 
-    private val searchedLeagueNameMutableSharedFlow = MutableSharedFlow<String>(replay = 1)
+    private val searchedLeagueNameMutableSharedFlow = MutableSharedFlow<String>(replay = 1).apply {
+        // Initial search to determine the "empty state"
+        tryEmit("")
+    }
     private val currentQueryMutableSharedFlow = MutableSharedFlow<String>(replay = 1)
 
     fun getSearchedLeagueNameFlow(): Flow<String> = searchedLeagueNameMutableSharedFlow

@@ -1,7 +1,7 @@
 package fr.neige_i.fdj_entretien.ui.search
 
-data class AutocompleteState(
+data class TeamUiModel(
     val id: Int,
-    val suggestion: String,
+    val badgeImageUrl: String?,
     val onClicked: () -> Unit,
 )
