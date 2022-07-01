@@ -18,7 +18,7 @@ class DetailPresenter @Inject constructor(
 
     private var detailView: DetailContract.View? = null
 
-    override fun onCreated(detailView: DetailContract.View) {
+    override fun onCreated(detailView: DetailContract.View?) {
         this.detailView = detailView
     }
 
@@ -29,14 +29,14 @@ class DetailPresenter @Inject constructor(
 
             withContext(coroutineDispatcherProvider.main) {
                 when (teamDetailResult) {
-                    is DataResult.Content -> detailView?.showDetailInfo(mapUiModel(teamDetail = teamDetailResult.data))
+                    is DataResult.Content -> detailView?.showDetailInfo(getUiModel(teamDetail = teamDetailResult.data))
                     is DataResult.Error -> detailView?.showErrorToast(teamDetailResult.errorMessage)
                 }
             }
         }
     }
 
-    private fun mapUiModel(teamDetail: TeamDetail) = DetailUiModel(
+    private fun getUiModel(teamDetail: TeamDetail) = DetailUiModel(
         toolbarTitle = teamDetail.teamResponse.strTeam
             ?.let { LocalText.Simple(content = it) }
             ?: LocalText.Res(stringId = R.string.unavailable_name),

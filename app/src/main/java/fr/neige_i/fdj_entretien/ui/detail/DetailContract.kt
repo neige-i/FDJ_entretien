@@ -10,7 +10,7 @@ interface DetailContract {
     }
 
     interface Presenter {
-        fun onCreated(detailView: View)
+        fun onCreated(detailView: View?)
         fun onTeamNameRetrieved(teamName: String)
         fun onDestroy()
     }
