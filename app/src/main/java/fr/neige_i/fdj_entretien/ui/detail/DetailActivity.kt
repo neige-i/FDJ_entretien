@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,7 +68,7 @@ class DetailActivity : AppCompatActivity(), DetailContract.View {
         binding.teamDescriptionText.text = detailUiModel.description.toCharSequence(this)
     }
 
-    override fun showErrorToast() {
-        Toast.makeText(this, R.string.detail_loading_error, Toast.LENGTH_SHORT).show()
+    override fun showErrorToast(@StringRes message: Int) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

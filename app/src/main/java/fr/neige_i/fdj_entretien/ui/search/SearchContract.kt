@@ -1,5 +1,7 @@
 package fr.neige_i.fdj_entretien.ui.search
 
+import androidx.annotation.StringRes
+
 interface SearchContract {
 
     interface View {
@@ -9,7 +11,7 @@ interface SearchContract {
         fun showAutocompleteSuggestions(autocompleteUiModels: List<AutocompleteUiModel>)
         fun showSearchResults(searchUiModel: SearchUiModel)
         fun openTeamDetails(teamName: String)
-        fun showErrorToast()
+        fun showErrorToast(@StringRes message: Int)
     }
 
     interface Presenter {

@@ -1,8 +1,11 @@
 package fr.neige_i.fdj_entretien.domain.detail
 
+import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.data.search.SearchRepository
 import fr.neige_i.fdj_entretien.data.sport_api.SportRepository
+import fr.neige_i.fdj_entretien.data.sport_api.model.NetworkResult
 import fr.neige_i.fdj_entretien.data.sport_api.model.TeamResponse
+import fr.neige_i.fdj_entretien.domain.DataResult
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
@@ -13,18 +16,28 @@ class GetTeamDetailUseCase @Inject constructor(
 ) {
 
     // STEP 6: API call
-    suspend operator fun invoke(teamName: String): TeamDetail? = withTimeoutOrNull(30_000) {
+    suspend operator fun invoke(teamName: String): DataResult<TeamDetail> = withTimeoutOrNull(30_000) {
         sportRepository.getTeamByName(teamName)
-    }?.let { team ->
+    }.let { teamResult ->
         // STEP 7: Handle API response
 
-        // Do NOT keep collecting the flow, only a snapshot is needed here
-        val searchedLeagueName = searchRepository.getSearchedLeagueNameFlow().first()
+        when (teamResult) {
+            is NetworkResult.Success -> {
+                // Do NOT keep collecting the flow, only a snapshot is needed here
+                val searchedLeagueName = searchRepository.getSearchedLeagueNameFlow().first()
 
-        TeamDetail(
-            teamResponse = team,
-            leagueToDisplay = searchedLeagueName.ifEmpty { getAllAvailableLeagues(team) }
-        )
+                val team = teamResult.content
+
+                DataResult.Content(
+                    data = TeamDetail(
+                        teamResponse = team,
+                        leagueToDisplay = searchedLeagueName.ifEmpty { getAllAvailableLeagues(team) }
+                    )
+                )
+            }
+            is NetworkResult.Failure.ApiFailure -> DataResult.Error(errorMessage = R.string.team_api_error)
+            else -> DataResult.Error(errorMessage = R.string.load_team_error)
+        }
     }
 
     private fun getAllAvailableLeagues(team: TeamResponse): String {

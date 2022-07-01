@@ -1,6 +1,7 @@
 package fr.neige_i.fdj_entretien.ui.detail
 
 import fr.neige_i.fdj_entretien.R
+import fr.neige_i.fdj_entretien.domain.DataResult
 import fr.neige_i.fdj_entretien.domain.detail.GetTeamDetailUseCase
 import fr.neige_i.fdj_entretien.domain.detail.TeamDetail
 import fr.neige_i.fdj_entretien.util.LocalText
@@ -22,13 +23,12 @@ class DetailPresenter @Inject constructor(
     override fun onTeamNameRetrieved(teamName: String) {
         scope.launch(Dispatchers.IO) {
 
-            val teamDetails = getTeamDetailUseCase.invoke(teamName)
+            val teamDetailResult = getTeamDetailUseCase.invoke(teamName)
 
             withContext(Dispatchers.Main) {
-                if (teamDetails != null) {
-                    detailView?.showDetailInfo(mapUiModel(teamDetails))
-                } else {
-                    detailView?.showErrorToast()
+                when (teamDetailResult) {
+                    is DataResult.Content -> detailView?.showDetailInfo(mapUiModel(teamDetail = teamDetailResult.data))
+                    is DataResult.Error -> detailView?.showErrorToast(teamDetailResult.errorMessage)
                 }
             }
         }

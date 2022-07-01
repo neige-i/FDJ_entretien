@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -112,7 +113,7 @@ class SearchActivity : AppCompatActivity(), SearchContract.View {
         startActivity(DetailActivity.navigate(this, teamName))
     }
 
-    override fun showErrorToast() {
-        Toast.makeText(this, R.string.no_team_found_error, Toast.LENGTH_SHORT).show()
+    override fun showErrorToast(@StringRes message: Int) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
