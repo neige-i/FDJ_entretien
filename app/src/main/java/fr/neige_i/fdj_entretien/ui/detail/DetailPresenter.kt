@@ -4,12 +4,14 @@ import fr.neige_i.fdj_entretien.R
 import fr.neige_i.fdj_entretien.domain.DataResult
 import fr.neige_i.fdj_entretien.domain.detail.GetTeamDetailUseCase
 import fr.neige_i.fdj_entretien.domain.detail.TeamDetail
+import fr.neige_i.fdj_entretien.util.CoroutineDispatcherProvider
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class DetailPresenter @Inject constructor(
     private val getTeamDetailUseCase: GetTeamDetailUseCase,
+    private val coroutineDispatcherProvider: CoroutineDispatcherProvider,
 ) : DetailContract.Presenter {
 
     private val scope = CoroutineScope(SupervisorJob())
@@ -21,11 +23,11 @@ class DetailPresenter @Inject constructor(
     }
 
     override fun onTeamNameRetrieved(teamName: String) {
-        scope.launch(Dispatchers.IO) {
+        scope.launch(coroutineDispatcherProvider.io) {
 
             val teamDetailResult = getTeamDetailUseCase.invoke(teamName)
 
-            withContext(Dispatchers.Main) {
+            withContext(coroutineDispatcherProvider.main) {
                 when (teamDetailResult) {
                     is DataResult.Content -> detailView?.showDetailInfo(mapUiModel(teamDetail = teamDetailResult.data))
                     is DataResult.Error -> detailView?.showErrorToast(teamDetailResult.errorMessage)
