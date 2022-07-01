@@ -6,6 +6,7 @@ import fr.neige_i.fdj_entretien.domain.DataResult
 import fr.neige_i.fdj_entretien.domain.search.GetAutocompleteResultUseCase
 import fr.neige_i.fdj_entretien.domain.search.GetSearchResultUseCase
 import fr.neige_i.fdj_entretien.domain.search.UpdateSearchUseCase
+import fr.neige_i.fdj_entretien.util.CoroutineDispatcherProvider
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -15,6 +16,7 @@ class SearchPresenter @Inject constructor(
     private val getSearchResultUseCase: GetSearchResultUseCase,
     private val getAutocompleteResultUseCase: GetAutocompleteResultUseCase,
     private val updateSearchUseCase: UpdateSearchUseCase,
+    private val coroutineDispatcherProvider: CoroutineDispatcherProvider,
 ) : SearchContract.Presenter {
 
     private val scope = CoroutineScope(SupervisorJob())
@@ -26,10 +28,10 @@ class SearchPresenter @Inject constructor(
     override fun onCreated(searchView: SearchContract.View) {
         this.searchView = searchView
 
-        scope.launch(Dispatchers.IO) {
+        scope.launch(coroutineDispatcherProvider.io) {
             getSearchResultUseCase.invoke().collectLatest { searchResult ->
                 // STEP 3: Handle API response
-                withContext(Dispatchers.Main) {
+                withContext(coroutineDispatcherProvider.main) {
                     when (searchResult) {
                         is DataResult.Content -> searchView.showSearchResults(
                             mapUiModel(teamResponses = searchResult.data)
@@ -64,10 +66,10 @@ class SearchPresenter @Inject constructor(
     }
 
     override fun onMenuCreated() {
-        scope.launch(Dispatchers.IO) {
+        scope.launch(coroutineDispatcherProvider.io) {
             getAutocompleteResultUseCase.invoke().collectLatest { autocompleteResult ->
 
-                withContext(Dispatchers.Main) {
+                withContext(coroutineDispatcherProvider.main) {
                     val currentQuery = autocompleteResult.currentQuery
 
                     when (val suggestionsResult = autocompleteResult.suggestedLeagues) {
