@@ -7,6 +7,7 @@ import fr.neige_i.fdj_entretien.domain.search.GetAutocompleteResultUseCase
 import fr.neige_i.fdj_entretien.domain.search.GetSearchResultUseCase
 import fr.neige_i.fdj_entretien.domain.search.UpdateSearchUseCase
 import fr.neige_i.fdj_entretien.util.CoroutineDispatcherProvider
+import fr.neige_i.fdj_entretien.util.EquatableCallback
 import fr.neige_i.fdj_entretien.util.LocalText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -25,7 +26,7 @@ class SearchPresenter @Inject constructor(
 
     private var isSearchViewExpanded = false
 
-    override fun onCreated(searchView: SearchContract.View) {
+    override fun onCreated(searchView: SearchContract.View?) {
         this.searchView = searchView
 
         scope.launch(coroutineDispatcherProvider.io) {
@@ -33,10 +34,10 @@ class SearchPresenter @Inject constructor(
                 // STEP 3: Handle API response
                 withContext(coroutineDispatcherProvider.main) {
                     when (searchResult) {
-                        is DataResult.Content -> searchView.showSearchResults(
+                        is DataResult.Content -> searchView?.showSearchResults(
                             mapUiModel(teamResponses = searchResult.data)
                         )
-                        is DataResult.Error -> searchView.showErrorToast(searchResult.errorMessage)
+                        is DataResult.Error -> searchView?.showErrorToast(searchResult.errorMessage)
                     }
                 }
             }
@@ -50,7 +51,7 @@ class SearchPresenter @Inject constructor(
                 badgeImageUrl = teamResponse.strTeamBadge ?: return@mapNotNull null,
                 onClicked = teamResponse.strTeam
                     ?.let {
-                        { searchView?.openTeamDetails(teamName = it) }
+                        EquatableCallback { searchView?.openTeamDetails(teamName = it) }
                     }
                     ?: return@mapNotNull null
             )
@@ -59,7 +60,7 @@ class SearchPresenter @Inject constructor(
         return SearchUiModel(
             resultCountText = LocalText.ResWithArgs(
                 stringId = R.string.team_count_in_league,
-                args = listOf(teamResponses.size)
+                args = listOf(teamList.size)
             ),
             teamUiModels = teamList,
         )

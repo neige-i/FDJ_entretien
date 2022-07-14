@@ -15,7 +15,7 @@ interface SearchContract {
     }
 
     interface Presenter {
-        fun onCreated(searchView: View)
+        fun onCreated(searchView: View?)
         fun onMenuCreated()
         fun onSearchViewExpanded(isExpanded: Boolean)
         fun onSearchModified(leagueName: String)
